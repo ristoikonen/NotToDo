@@ -87,7 +87,7 @@ namespace NotToDo
 
         public void DisplayAll()
         {
-            Remind.ReminderExample();
+            
 
             using (SqlConnection conn = new SqlConnection(cs))
             {

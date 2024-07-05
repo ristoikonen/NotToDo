@@ -13,11 +13,11 @@ namespace NotToDo.OutlookAccess
     {
 
 
-        public static void ReminderExample()
+        public static void ReminderExample(int empid, DateTime startDate)
         {
             //try
             //{
-                Microsoft.Office.Interop.Outlook.Application appt = new Microsoft.Office.Interop.Outlook.Application();
+            Microsoft.Office.Interop.Outlook.Application appt = new Microsoft.Office.Interop.Outlook.Application();
             // Log in to Outlook
             NameSpace outlookNamespace = appt.GetNamespace("MAPI");
             outlookNamespace.Logon();
@@ -38,10 +38,10 @@ namespace NotToDo.OutlookAccess
             apt.Subject = "sub";
             apt.Body = "body";
 
-            apt.Start = DateTime.Now.AddHours(1);
-            apt.End = DateTime.Now.AddHours(2);
+            apt.Start = startDate; //DateTime.Now.AddHours(1);
+            apt.End = startDate.AddHours(1);
             
-            apt.ReminderMinutesBeforeStart = 24; // * 60 * 7 * 1;  // One week reminder
+            apt.ReminderMinutesBeforeStart = 60; // * 60 * 7 * 1;  // One week reminder
 
             // Makes it appear bold in the calendar - which I like!
             apt.BusyStatus = Outlook.OlBusyStatus.olTentative;
@@ -53,7 +53,7 @@ namespace NotToDo.OutlookAccess
            // myPattern.RecurrenceType = Outlook.OlRecurrenceType.olRecursYearly;
            // myPattern.Interval = 1;
             apt.Save();
-
+/*
                 //Outlook.MailItem mailItem = (Outlook.MailItem)
                 // this.Application.CreateItem(Outlook.OlItemType.olMailItem);
 
@@ -69,6 +69,7 @@ namespace NotToDo.OutlookAccess
             outlookNamespace.Logoff();
             System.Runtime.InteropServices.Marshal.ReleaseComObject(outlookNamespace);
             System.Runtime.InteropServices.Marshal.ReleaseComObject(appt);
+*/
 /*
                 // Get the Inbox folder
                 MAPIFolder inboxFolder = outlookNamespace.GetDefaultFolder(OlDefaultFolders.olFolderInbox);

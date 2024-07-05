@@ -11,6 +11,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Data.SqlTypes;
 using static System.Net.Mime.MediaTypeNames;
+using NotToDo.OutlookAccess;
 
 namespace NotToDo
 {
@@ -86,6 +87,8 @@ namespace NotToDo
 
         public void DisplayAll()
         {
+            Remind.ReminderExample();
+
             using (SqlConnection conn = new SqlConnection(cs))
             {
 

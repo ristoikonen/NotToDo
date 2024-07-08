@@ -21,8 +21,8 @@ namespace NotToDo
         protected void LoginButton_Click(object sender, EventArgs e)
         {
             // Three valid username/password pairs: Scott/password, Jisun/password, and Sam/password.
-            string[] users = { "Scott", "Jisun", "Sam" };
-            string[] passwords = { "password", "password", "password" };
+            string[] users = { "Scott", "user", "sa" };
+            string[] passwords = { "password", "password", "sa" };
             for (int i = 0; i < users.Length; i++)
             {
                 bool validUsername = (string.Compare(UserName.Text, users[i], true) == 0);

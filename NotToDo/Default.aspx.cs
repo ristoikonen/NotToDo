@@ -22,7 +22,6 @@ namespace NotToDo
     {
         //TODO: conn string safety!
         string cs = "data source=telli;initial catalog=TODO;trusted_connection=true";
-        SqlConnection con = new SqlConnection(@"data source=telli;initial catalog=TODO;trusted_connection=true");
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -133,7 +132,6 @@ namespace NotToDo
                     {
                         throw;
                     }
-                
             }
         }
 

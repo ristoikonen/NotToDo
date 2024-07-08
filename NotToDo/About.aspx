@@ -3,10 +3,11 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <main aria-labelledby="title">
 
-
+        <h2>Check readme.md for database installation instructions.</h2>
+        <div>Steps taken</div>
          <ul class="list-group">
               <li class="list-group-item">
-                    1. Install SQL Server 2022, IIS as Windows feature.
+                    1. Start with adding Web Forms support to VS 2022, install SQL Server and IIS as Windows feature.
               </li>
               <li class="list-group-item">
                     2. Get template sample from GitHub: simple, Web Forms app:	https://gist.github.com/Aneeq/dc10e6ef5e8c363dd7acd80a157c40d3

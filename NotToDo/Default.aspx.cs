@@ -13,6 +13,8 @@ using System.Data.SqlTypes;
 using static System.Net.Mime.MediaTypeNames;
 using System.Web.ModelBinding;
 using NotToDo.OutlookAccess;
+using System.Security.Policy;
+using Microsoft.Office.Interop.Outlook;
 
 namespace NotToDo
 {
@@ -31,22 +33,41 @@ namespace NotToDo
         }
 
 
-        //protected void DisplayAll()
+        //protected void Button1_Click(object sender, EventArgs e)
         //{
-        //    using (SqlConnection conn = new SqlConnection(cs))
+        //    Label4.Text = DateTime.Now.ToLongTimeString();
+        //    Label5.Text = DateTime.Now.ToLongTimeString();
+        //    //string str = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "YourColumnName"));
+        //    DateTime dodate;
+
+        //    foreach (GridViewRow row in GridView1.Rows)
         //    {
+        //       //row.Cells[0].Text = "Hello";
+        //        string x = row.Cells[3].Text;
+        //        if (DateTime.TryParse(row.Cells[3].Text, out dodate))
+        //        { 
+        //            int result = DateTime.Compare(DateTime.Now, dodate);
+        //            Label5.Text = dodate.ToLongTimeString();
 
-        //        SqlCommand cmd = new SqlCommand("SELECT * from Todo  WHERE Startdate >= GETDATE()", conn);
-        //        DataTable dt = new DataTable();
-        //        SqlDataAdapter adp = new SqlDataAdapter(cmd);
-        //        adp.Fill(dt);
-        //        DumpDataTable(dt);
-        //        GridView1.DataSource = dt;
-        //        GridView1.DataBind();
+        //        }
+        //        foreach (TableCell cell in row.Cells)
+        //        {
+        //            cell.Text = "Hesllo";
+        //            //int index = cell.ColumnIndex;
+        //            //if (index == 0)
+        //            //{
+        //            //    value = cell.Value.ToString();
+        //            //do what you want with the value
+        //            // }
+        //        }
+
         //    }
+
         //}
-
-
+        //protected void Button2_Click(object sender, EventArgs e)
+        //{
+        //    Label4.Text = DateTime.Now.ToLongTimeString();
+        //}
 
 
         public void ShowPage()
@@ -60,7 +81,7 @@ namespace NotToDo
                 DataTable dt = new DataTable();
                 SqlDataAdapter adp = new SqlDataAdapter(cmd);
                 adp.Fill(dt);
-                DumpDataTable(dt);
+                //DumpDataTable(dt);
                 GridView1.DataSource = dt;
                 GridView1.DataBind();
             }
@@ -121,10 +142,6 @@ namespace NotToDo
                 cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
                 cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
                 cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
-
-
-
-                //string sql = string.Format($"INSERT into dbo.Todo values('{txtname.Text}', '{txtdetails.Text}', '{sdodate}'"); //, txtname.Text, txtdetails.Text, txtdodate.Text);CAST('{txtdodateloc.Text}' AS DATETIME)
 
                 Debug.WriteLine(sql ?? "");
 
@@ -204,9 +221,6 @@ namespace NotToDo
             Int32.TryParse(args[0], out empid);
             DateTime.TryParse(args[1], out startdate);
 
-
-            //bool ok = Int32.TryParse(((LinkButton)sender).CommandArgument, out empid);
-            //bool ok2 = DateTime.TryParse(((LinkButton)sender).CommandArgument, out startdate);
             //TODO: validate
             Remind.ReminderExample(empid, startdate);
             /*
@@ -237,6 +251,23 @@ namespace NotToDo
             Session["id"] = btn.CommandArgument;
             */
 
+            DateTime dodate;
+            if (DateTime.TryParse(txtdodateloc.Text, out dodate))
+            {
+                dodate = dodate.ToUniversalTime();
+
+            }
+                //    foreach (GridViewRow row in GridView1.Rows)
+                //    {
+                //       //row.Cells[0].Text = "Hello";
+                //        string x = row.Cells[3].Text;
+                //        if (DateTime.TryParse(row.Cells[3].Text, out dodate))
+                //        { 
+                //            int result = DateTime.Compare(DateTime.Now, dodate);
+                //            Label5.Text = dodate.ToLongTimeString();
+
+                //        }
+
 
             using (SqlConnection conn = new SqlConnection(cs))
             {
@@ -250,7 +281,7 @@ namespace NotToDo
 
                 //string sql = string.Format("update {0} set name='" + {1}    +"', mno='" + { 2}
                 //+"'where empid='" + Session["id"] + "'", tableName, txtname.Text, txtdetails.Text);
-
+               //CAST(@ts AT TIME ZONE 'Pacific Standard Time' AT TIME ZONE 'UTC' AS DATETIME)
                 Debug.WriteLine(sql);
 
                 conn.Open();
@@ -260,7 +291,7 @@ namespace NotToDo
                                                             //cmd.Parameters.AddWithValue("@details", txtdetails.Text);
                 cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
                 cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
-                cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = txtdodateloc.Text;
+                cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; // txtdodateloc.Text;
 
                 //cmd.Parameters.AddWithValue("@dodate", dodate);
                 cmd.ExecuteNonQuery();
@@ -272,17 +303,22 @@ namespace NotToDo
         protected void BtnDelete_Click(object sender, EventArgs e)
         {
 
-            string id = txtid.Text;
-
+            int id = Int32.Parse(txtid.Text ?? "");
 
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();
                 //SqlCommand cmd = new SqlCommand("DELETE from tblemp where empid='" + Session["id"] + "'", conn);
 
+                // '{id}'
+                string sql = string.Format($"DELETE from Todo where empid = @id");
 
-                string sql = string.Format($"DELETE from Todo where empid = '{id}'");
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                SqlCommand cmd = new SqlCommand(sql, conn); // string.Format("UPDATE {0} SET name='\" + @colval1 + \"' mno='\" + @colval2 + \"' where empid='\" + id  + \"' ", tableName), con);
+                                                            //cmd.Parameters.Add("@colval", empid);
+                                                            //cmd.Parameters.AddWithValue("@name", txtname.Text);
+                                                            //cmd.Parameters.AddWithValue("@details", txtdetails.Text);
+                cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
                 cmd.ExecuteNonQuery();
 
                 lblmsg.Text = "Record Deleted";
@@ -295,7 +331,7 @@ namespace NotToDo
         {
             txtdetails.Text = "";
             txtname.Text = "";
-            txtdodate.Text = "";
+            txtdodateloc.Text = "";
         }
 
 

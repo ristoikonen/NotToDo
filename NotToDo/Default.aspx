@@ -1,8 +1,36 @@
 ﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="NotToDo._Default" %>
 
+
+
+
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <main aria-labelledby="title">
 <%--<form id="form1" runat="server">--%>
+
+
+<%--         <div>
+            <asp:UpdatePanel ID="UpdatePanel1" runat="server"
+               UpdateMode="Conditional">
+               <ContentTemplate>
+                  <asp:Label ID="Label4" runat="server" />
+                  <br />
+                  <asp:Button ID="Button1" runat="server"
+                     Text="Update Both Panels" OnClick="Button1_Click" />
+                  <asp:Button ID="Button2" runat="server"
+                     Text="Update This Panel" OnClick="Button2_Click" />
+               </ContentTemplate>
+            </asp:UpdatePanel>
+                         <asp:UpdatePanel ID="UpdatePanel2" runat="server"
+               UpdateMode="Conditional">
+               <ContentTemplate>
+                  <asp:Label ID="Label5" runat="server" ForeColor="red" />
+               </ContentTemplate>
+               <Triggers>
+                  <asp:AsyncPostBackTrigger ControlID="Button1" EventName="Click" />
+               </Triggers>
+            </asp:UpdatePanel>
+    </div>--%>
+
     <div>
     
         <asp:Label ID="Label1" runat="server" Text="Name"></asp:Label>
@@ -15,8 +43,8 @@
         <br /><br />
 
         <asp:Label ID="Label3" runat="server" Text="Date"></asp:Label>
-        <asp:TextBox ID="txtdodate" TextMode="Date" runat="server"></asp:TextBox>
-        <asp:TextBox ID="t" TextMode="DateTime" runat="server"></asp:TextBox>
+<%--        <asp:TextBox ID="txtdodate" TextMode="Date" runat="server"></asp:TextBox>
+        <asp:TextBox ID="t" TextMode="DateTime" runat="server"></asp:TextBox>--%>
         <asp:TextBox ID="txtdodateloc"  TextMode="DateTimeLocal" runat="server"></asp:TextBox>
         <br /><br />
 

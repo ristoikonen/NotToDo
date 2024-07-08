@@ -43,10 +43,15 @@ namespace NotToDo
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
+
+                    //Debug.WriteLine(cmd.CommandText ?? "");
+
                     DataTable dt = new DataTable();
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);
+
                     //DumpDataTable(dt);
+                    
                     GridView1.DataSource = dt;
                     GridView1.DataBind();
                 }
@@ -76,9 +81,8 @@ namespace NotToDo
                 {
                     string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
 
-                    //Debug.WriteLine(sql ?? "");
-
                     conn.Open();
+
                     SqlCommand cmd = new SqlCommand(sql, conn);
 
                     DateTime dodate = DateTime.Parse(txtdodateloc.Text);
@@ -114,10 +118,9 @@ namespace NotToDo
         {
             string tableName = "Todo";
             string id = txtid.Text;
-            DateTime dodate;
             try
             {
-                if (DateTime.TryParse(txtdodateloc.Text, out dodate))
+                if (DateTime.TryParse(txtdodateloc.Text, out DateTime dodate))
                 {
                     dodate = dodate.ToUniversalTime();
 
@@ -127,13 +130,13 @@ namespace NotToDo
                         //Debug.WriteLine(sql);
 
                         conn.Open();
-                        SqlCommand cmd = new SqlCommand(sql, conn);
 
+                        SqlCommand cmd = new SqlCommand(sql, conn);
                         cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
                         cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
                         cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; // txtdodateloc.Text;
-
                         cmd.ExecuteNonQuery();
+
                         lblmsg.Text = "Record Updated Successfully";
                     }
                 }
@@ -157,17 +160,15 @@ namespace NotToDo
         /// <param name="e"></param>
         protected void BtnDelete_Click(object sender, EventArgs e)
         {
-            int id = 0;
             try
             {
-                if (Int32.TryParse(txtid.Text, out id))
+                if (Int32.TryParse(txtid.Text, out int id))
                 {
                     using (SqlConnection conn = new SqlConnection(cs))
                     {
                         conn.Open();
 
                         string sql = string.Format($"DELETE from Todo where empid = @id");
-
                         SqlCommand cmd = new SqlCommand(sql, conn);
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
                         cmd.ExecuteNonQuery();
@@ -216,12 +217,11 @@ namespace NotToDo
                         //DumpDataTable(dt);
                         if (dt.Rows.Count >= 0)
                         {
-                            DateTime dodate;
                             txtid.Text = dt.Rows[0]["empid"].ToString();
                             txtname.Text = dt.Rows[0]["name"].ToString();
                             txtdetails.Text = dt.Rows[0]["details"].ToString();
-                            // TODO errors -  if success
-                            if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out dodate))
+
+                            if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out DateTime dodate))
                             {
                                 dodate = dodate.ToLocalTime();
                                 txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
@@ -290,6 +290,7 @@ namespace NotToDo
             {
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
+                    //TODO has dependency on index
                     if (DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
                     {
                         int result = DateTime.Compare(DateTime.Now, dodate);

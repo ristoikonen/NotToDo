@@ -2,8 +2,36 @@
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <main aria-labelledby="title">
+
+
+     <ul class="list-group">
+          <li class="list-group-item">
+                1. Install SQL Server 2022, IIS as Windows feature.
+          </li>
+          <li class="list-group-item">
+                2. Get template sample from GitHub: simple, Web Forms app:	https://gist.github.com/Aneeq/dc10e6ef5e8c363dd7acd80a157c40d3
+          </li>
+          <li class="list-group-item">
+                3. Solutions setup: Connections, create basic table, git codebase.
+          </li>
+          <li class="list-group-item">
+                4. Replace CRUDs, remove session variable, add Display and Clear UI methods.
+
+          </li>
+          <li class="list-group-item">
+                5. Change Db dates to UTC and display dates to local datetime , add conversions, time handling of form
+          </li>
+          <li class="list-group-item">
+                6. Add crude Outlook reminder integration
+          </li>
+         <li class="list-group-item">
+                7.  Add basic, no good, Forms login
+            </li>
+    </ul>
+    
+
 <%--<form id="form1" runat="server">--%>
-    <div>
+ <%--   <div>
     
         <asp:Label ID="Label1" runat="server" Text="Name"></asp:Label>
         <asp:TextBox ID="txtid" runat="server" Visible ="False"></asp:TextBox>
@@ -18,7 +46,7 @@
         <asp:TextBox ID="txtdodate" runat="server"></asp:TextBox>
         <br /><br />
 
-        <%--<asp:Label ID="LblDob" runat="server" Text='<%# Bind("DateofBirth") %>'>--%>
+  
 
         <asp:Label ID="lblmsg" runat="server" Text=""></asp:Label>
         <br /><br />
@@ -43,27 +71,8 @@
 
         </asp:GridView>
 
-    </div>
-<%--    </form>    --%>
 
-
-        <div class="form-group">
-    <label class="control-label col-lg-2">Time and Date</label>
-    <div class="col-lg-10">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class='input-group date' id="datetimepicker">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar">spps</span>
-                    </span>
-                </div>
-            </div>
-            <div class="col-lg-6 pull-right">
-                divvv
-            </div>
-        </div>
-    </div>
-</div>
+  </form>    --%>
 
 
     </main>

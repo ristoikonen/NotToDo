@@ -32,30 +32,33 @@
     </div>--%>
 
     <div>
-    
-        <asp:Label ID="Label1" runat="server" Text="Name"></asp:Label>
+
         <asp:TextBox ID="txtid" runat="server" Visible ="False"></asp:TextBox>
-        <br /><br />
-        <asp:TextBox ID="txtname" runat="server"></asp:TextBox>
-        <br /><br />
-        <asp:Label ID="Label2" runat="server" Text="Details"></asp:Label>
-        <asp:TextBox ID="txtdetails" runat="server"></asp:TextBox>
+
+        <div class="container">
+            <div class="mb-3">
+              <label for="formFileMultiple" class="form-label"><asp:Label ID="Label4" runat="server" Text="Name"></asp:Label></label>
+              <asp:TextBox ID="txtname" runat="server"></asp:TextBox>
+            </div>
+            <div class="mb-3">
+                <asp:Label ID="Label2" runat="server" Text="Details"></asp:Label>
+                <asp:TextBox ID="txtdetails" runat="server"></asp:TextBox>
+            </div>
+            <div class="mb-3">
+                <asp:Label ID="Label3" runat="server" Text="Date"></asp:Label>
+                <asp:TextBox ID="txtdodateloc"  TextMode="DateTimeLocal" runat="server"></asp:TextBox>
+            </div>
+            
+        </div>
+    
+         <div class="container">
+            <asp:Button ID="Button1" runat="server" Text="Add" OnClick="BtnAdd_Click" />
+            <asp:Button ID="Button2" runat="server" Text="Update" OnClick="BtnUpdate_Click" />
+            <asp:Button ID="Button3" runat="server" Text="Delete" OnClick="BtnDelete_Click" />
         <br /><br />
 
-        <asp:Label ID="Label3" runat="server" Text="Date"></asp:Label>
-<%--        <asp:TextBox ID="txtdodate" TextMode="Date" runat="server"></asp:TextBox>
-        <asp:TextBox ID="t" TextMode="DateTime" runat="server"></asp:TextBox>--%>
-        <asp:TextBox ID="txtdodateloc"  TextMode="DateTimeLocal" runat="server"></asp:TextBox>
-        <br /><br />
-
-
-        <asp:Label ID="lblmsg" runat="server" Text=""></asp:Label>
-        <br /><br />
-
-        <asp:Button ID="BtnAdd" runat="server" Text="Add" OnClick="BtnAdd_Click" />
-        <asp:Button ID="BtnUpdate" runat="server" Text="Update" OnClick="BtnUpdate_Click" />
-        <asp:Button ID="BtnDelete" runat="server" Text="Delete" OnClick="BtnDelete_Click" />
-        <br /><br />
+            
+        </div>
         <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false">
             <Columns>
                 <asp:BoundField DataField="empid" Visible="False" />
@@ -73,6 +76,10 @@
             </Columns>
 
         </asp:GridView>
+        
+        <br /><br />
+        <p class="fw-light"><asp:Label ID="lblmsg" runat="server" Text=""></asp:Label></p>
+
 
     </div>
 <%--    </form>    --%>
@@ -116,24 +123,5 @@
                  </ContentTemplate>
 </asp:UpdatePanel>--%>
 
-
-
-        <div class="form-group">
-    <label class="control-label col-lg-2">Time and Date</label>
-    <div class="col-lg-10">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class='input-group date' id="datetimepicker">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar">spps</span>
-                    </span>
-                </div>
-            </div>
-            <div class="col-lg-6 pull-right">
-                divvv
-            </div>
-        </div>
-    </div>
-</div>
 </main>
 </asp:Content>

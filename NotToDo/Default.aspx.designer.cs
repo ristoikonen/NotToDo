@@ -15,15 +15,6 @@ namespace NotToDo
     {
 
         /// <summary>
-        /// Label1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label1;
-
-        /// <summary>
         /// txtid control.
         /// </summary>
         /// <remarks>
@@ -31,6 +22,15 @@ namespace NotToDo
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtid;
+
+        /// <summary>
+        /// Label4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label4;
 
         /// <summary>
         /// txtname control.
@@ -78,40 +78,31 @@ namespace NotToDo
         protected global::System.Web.UI.WebControls.TextBox txtdodateloc;
 
         /// <summary>
-        /// lblmsg control.
+        /// Button1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblmsg;
+        protected global::System.Web.UI.WebControls.Button Button1;
 
         /// <summary>
-        /// BtnAdd control.
+        /// Button2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnAdd;
+        protected global::System.Web.UI.WebControls.Button Button2;
 
         /// <summary>
-        /// BtnUpdate control.
+        /// Button3 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnUpdate;
-
-        /// <summary>
-        /// BtnDelete control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnDelete;
+        protected global::System.Web.UI.WebControls.Button Button3;
 
         /// <summary>
         /// GridView1 control.
@@ -121,5 +112,14 @@ namespace NotToDo
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView GridView1;
+
+        /// <summary>
+        /// lblmsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblmsg;
     }
 }

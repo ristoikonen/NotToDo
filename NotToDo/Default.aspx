@@ -31,7 +31,7 @@
 
             
         </div>
-        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false">
+        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false"  onrowdatabound="GridView1_RowDataBound" >
             <Columns>
                 <asp:BoundField DataField="empid" Visible="False" />
                 <asp:BoundField DataField="name" HeaderText="Name" />

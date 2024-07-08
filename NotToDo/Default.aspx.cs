@@ -32,13 +32,12 @@ namespace NotToDo
             }
         }
 
-
+        // Events with one day diff and all future events shown
         public void ShowPage()
         {
             using (SqlConnection conn = new SqlConnection(cs))
             {
-
-                SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE Dodate >= GETUTCDATE()", conn);
+                SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
                 DataTable dt = new DataTable();
                 SqlDataAdapter adp = new SqlDataAdapter(cmd);
                 adp.Fill(dt);
@@ -57,7 +56,7 @@ namespace NotToDo
             {
                 string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
 
-                Debug.WriteLine(sql ?? "");
+                //Debug.WriteLine(sql ?? "");
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
@@ -71,12 +70,12 @@ namespace NotToDo
 
                 cmd.ExecuteNonQuery();
                 lblmsg.Text = "Record Inserted Successfully";
-
             }
 
             ShowPage();
             ClearAllFields();
         }
+
 
         protected void Select_Click(object sender, EventArgs e)
         {
@@ -113,6 +112,7 @@ namespace NotToDo
             }
         }
 
+
         // Uses Microsoft.Office.Interop.Outlook.Application
         // TODO: missing parameters and validation
         protected void Reminder_Click(object sender, EventArgs e)
@@ -121,15 +121,13 @@ namespace NotToDo
             DateTime startdate;
             string arguments = ((LinkButton)sender).CommandArgument;
             string[] args = arguments.Split(';');
-
             
             if (Int32.TryParse(args[0], out empid))
             { 
                 if(DateTime.TryParse(args[1], out startdate))
                     try
                     {
-                        
-                        Remind.ReminderExample(empid, startdate);
+                         Remind.ReminderExample(empid, startdate);
                     }
                     catch (System.Exception)
                     {
@@ -171,6 +169,7 @@ namespace NotToDo
             ShowPage();
         }
 
+
         protected void BtnDelete_Click(object sender, EventArgs e)
         {
             int id = 0;
@@ -194,6 +193,7 @@ namespace NotToDo
             ClearAllFields();
         }
 
+
         public void ClearAllFields()
         {
             txtdetails.Text = "";
@@ -201,6 +201,42 @@ namespace NotToDo
             txtdodateloc.Text = "";
         }
 
+        protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                if(DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
+                {                     
+                    int result = DateTime.Compare(DateTime.Now, dodate);
+                    if (result <= 0)
+                    {
+                        e.Row.BackColor = System.Drawing.Color.LightYellow;
+                    }
+                }
+                //DateTime dod = Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "dodate"));
+
+
+            }
+        }
+       
+        //protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+        //{
+        //    if (e.Row.RowType == DataControlRowType.DataRow)
+        //    {
+        //        // Get the value of the desired column
+        //        int value = Convert.ToInt32(DataBinder.Eval(e.Row.DataItem, "ColumnName"));
+
+        //        // Check if the value is greater than 10
+        //        if (value > 10)
+        //        {
+        //            // Store the value in a list
+        //            List<int> values = ViewState["Values"] as List<int> ?? new List<int>();
+        //            values.Add(value);
+        //            ViewState["Values"] = values;
+        //        }
+        //    }
+
+        //}
 
         public static void DumpDataTable(DataTable table)
         {
@@ -223,7 +259,6 @@ namespace NotToDo
 
             return; 
         }
-
 
 
         //protected void Button1_Click(object sender, EventArgs e)

@@ -15,6 +15,7 @@ using System.Web.ModelBinding;
 using NotToDo.OutlookAccess;
 using System.Security.Policy;
 using Microsoft.Office.Interop.Outlook;
+using System.Diagnostics.Tracing;
 
 namespace NotToDo
 {
@@ -31,44 +32,157 @@ namespace NotToDo
             }
         }
 
-        // Events with one day diff and all future events shown
+        /// <summary>
+        /// Show events with one day diff and all future events in data grid
+        /// Display dates local, database dates UTC
+        /// </summary>
         public void ShowPage()
         {
-            using (SqlConnection conn = new SqlConnection(cs))
+            try
             {
-                SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
-                DataTable dt = new DataTable();
-                SqlDataAdapter adp = new SqlDataAdapter(cmd);
-                adp.Fill(dt);
-                //DumpDataTable(dt);
-                GridView1.DataSource = dt;
-                GridView1.DataBind();
+                using (SqlConnection conn = new SqlConnection(cs))
+                {
+                    SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
+                    DataTable dt = new DataTable();
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                    //DumpDataTable(dt);
+                    GridView1.DataSource = dt;
+                    GridView1.DataBind();
+                }
+            }
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
             }
         }
 
-
+        /// <summary>
+        /// Insert the record
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void BtnAdd_Click(object sender, EventArgs e)
         {
             string tableName = "Todo";
 
-            using (SqlConnection conn = new SqlConnection(cs))
+            try
             {
-                string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
+                using (SqlConnection conn = new SqlConnection(cs))
+                {
+                    string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
 
-                //Debug.WriteLine(sql ?? "");
+                    //Debug.WriteLine(sql ?? "");
 
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                                
-                DateTime dodate = DateTime.Parse(txtdodateloc.Text);
-                string sdodate = dodate.ToUniversalTime().ToString( "yyyy-MM-ddTHH:mm:ss"); 
-                                                                                           
-                cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
-                cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
-                cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand(sql, conn);
 
-                cmd.ExecuteNonQuery();
-                lblmsg.Text = "Record Inserted Successfully";
+                    DateTime dodate = DateTime.Parse(txtdodateloc.Text);
+                    string sdodate = dodate.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss");
+
+                    cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
+                    cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
+                    cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
+
+                    cmd.ExecuteNonQuery();
+                    lblmsg.Text = "Record Inserted Successfully";
+                }
+            }
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            ShowPage();
+            ClearAllFields();
+        }
+
+        /// <summary>
+        /// Update the record
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void BtnUpdate_Click(object sender, EventArgs e)
+        {
+            string tableName = "Todo";
+            string id = txtid.Text;
+            DateTime dodate;
+            try
+            {
+                if (DateTime.TryParse(txtdodateloc.Text, out dodate))
+                {
+                    dodate = dodate.ToUniversalTime();
+
+                    using (SqlConnection conn = new SqlConnection(cs))
+                    {
+                        string sql = string.Format($"UPDATE {tableName} set name = @name , details= @details , dodate= @dodate where empid = '{id}'");
+                        //Debug.WriteLine(sql);
+
+                        conn.Open();
+                        SqlCommand cmd = new SqlCommand(sql, conn);
+
+                        cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
+                        cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
+                        cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; // txtdodateloc.Text;
+
+                        cmd.ExecuteNonQuery();
+                        lblmsg.Text = "Record Updated Successfully";
+                    }
+                }
+            }
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            ShowPage();
+        }
+
+        /// <summary>
+        /// Delete the record
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void BtnDelete_Click(object sender, EventArgs e)
+        {
+            int id = 0;
+            try
+            {
+                if (Int32.TryParse(txtid.Text, out id))
+                {
+                    using (SqlConnection conn = new SqlConnection(cs))
+                    {
+                        conn.Open();
+
+                        string sql = string.Format($"DELETE from Todo where empid = @id");
+
+                        SqlCommand cmd = new SqlCommand(sql, conn);
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                        cmd.ExecuteNonQuery();
+
+                        lblmsg.Text = "Record Deleted";
+                    }
+                }
+            }
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
             }
 
             ShowPage();
@@ -76,51 +190,72 @@ namespace NotToDo
         }
 
 
+        /// <summary>
+        /// Grids Select link
+        /// </summary>
+        /// <param name="sender">Has rows id</param>
+        /// <param name="e"></param>
         protected void Select_Click(object sender, EventArgs e)
         {
             int empid = 0;
             string tableName = "Todo";
-            if(Int32.TryParse(((LinkButton)sender).CommandArgument, out empid))
-            { 
-                int rowIndex = Convert.ToInt32(((LinkButton)sender).CommandArgument);
-                // ex?
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
+            try
+            {
+                if (Int32.TryParse(((LinkButton)sender).CommandArgument, out empid))
+                { 
+                    int rowIndex = Convert.ToInt32(((LinkButton)sender).CommandArgument);
 
-                    SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE empid = @colval;"), conn);
-                    cmd.Parameters.Add("@colval", SqlDbType.Int).Value = empid;
-
-                    DataTable dt = new DataTable();
-                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
-                    adp.Fill(dt);
-                    //DumpDataTable(dt);
-                    if (dt.Rows.Count >= 0)
+                    using (SqlConnection conn = new SqlConnection(cs))
                     {
-                        DateTime dodate;
-                        txtid.Text = dt.Rows[0]["empid"].ToString();
-                        txtname.Text = dt.Rows[0]["name"].ToString();
-                        txtdetails.Text = dt.Rows[0]["details"].ToString();
-                        // TODO errors -  if success
-                        if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out dodate))
+                        SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE empid = @colval;"), conn);
+                        cmd.Parameters.Add("@colval", SqlDbType.Int).Value = empid;
+
+                        DataTable dt = new DataTable();
+                        SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                        adp.Fill(dt);
+                        //DumpDataTable(dt);
+                        if (dt.Rows.Count >= 0)
                         {
-                            dodate = dodate.ToLocalTime();
-                            txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
+                            DateTime dodate;
+                            txtid.Text = dt.Rows[0]["empid"].ToString();
+                            txtname.Text = dt.Rows[0]["name"].ToString();
+                            txtdetails.Text = dt.Rows[0]["details"].ToString();
+                            // TODO errors -  if success
+                            if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out dodate))
+                            {
+                                dodate = dodate.ToLocalTime();
+                                txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
+                            }
                         }
                     }
                 }
             }
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
 
-        // Uses Microsoft.Office.Interop.Outlook.Application
-        // TODO: missing parameters and validation
+        /// <summary>
+        /// Grids create Outlook reminder link
+        /// Uses Microsoft.Office.Interop.Outlook.Application
+        /// Missing passing parameters to Outlook and their validation
+        /// </summary>
+        /// <param name="sender">Has params, id, datetime...</param>
+        /// <param name="e"></param>
         protected void Reminder_Click(object sender, EventArgs e)
         {
             int empid = 0;
             DateTime startdate;
             string arguments = ((LinkButton)sender).CommandArgument;
             string[] args = arguments.Split(';');
-            
+
+            // TODO: missing parameters and validation
             if (Int32.TryParse(args[0], out empid))
             { 
                 if(DateTime.TryParse(args[1], out startdate))
@@ -128,67 +263,11 @@ namespace NotToDo
                     {
                          Remind.ReminderExample(empid, startdate);
                     }
-                    catch (System.Exception)
+                    catch (System.Exception ex )
                     {
-                        throw;
+                        Debug.WriteLine(ex.ToString());
                     }
             }
-        }
-
-
-        protected void BtnUpdate_Click(object sender, EventArgs e)
-        {
-
-            string tableName = "Todo";
-            string id = txtid.Text;
-            DateTime dodate;
-
-            if (DateTime.TryParse(txtdodateloc.Text, out dodate))
-            {
-                dodate = dodate.ToUniversalTime();
-
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-
-                    string sql = string.Format($"update {tableName} set name = @name , details= @details , dodate= @dodate where empid = '{id}'");
-                    //Debug.WriteLine(sql);
-
-                    conn.Open();
-                    SqlCommand cmd = new SqlCommand(sql, conn); 
-                                                            
-                    cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
-                    cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
-                    cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; // txtdodateloc.Text;
-
-                    cmd.ExecuteNonQuery();
-                    lblmsg.Text = "Record Updated Successfully";
-                }
-            }
-            ShowPage();
-        }
-
-
-        protected void BtnDelete_Click(object sender, EventArgs e)
-        {
-            int id = 0;
-            if(Int32.TryParse(txtid.Text , out id))
-            { 
-                using (SqlConnection conn = new SqlConnection(cs))
-                {
-                    conn.Open();
-
-                    string sql = string.Format($"DELETE from Todo where empid = @id");
-
-                    SqlCommand cmd = new SqlCommand(sql, conn); 
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
-                    cmd.ExecuteNonQuery();
-
-                    lblmsg.Text = "Record Deleted";
-                }
-            }
-
-            ShowPage();
-            ClearAllFields();
         }
 
 
@@ -199,43 +278,39 @@ namespace NotToDo
             txtdodateloc.Text = "";
         }
 
+
+        /// <summary>
+        /// Color data grids future events yellow
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
         {
-            if (e.Row.RowType == DataControlRowType.DataRow)
+            try
             {
-                if(DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
-                {                     
-                    int result = DateTime.Compare(DateTime.Now, dodate);
-                    if (result <= 0)
+                if (e.Row.RowType == DataControlRowType.DataRow)
+                {
+                    if (DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
                     {
-                        e.Row.BackColor = System.Drawing.Color.LightYellow;
+                        int result = DateTime.Compare(DateTime.Now, dodate);
+                        if (result <= 0)
+                        {
+                            e.Row.BackColor = System.Drawing.Color.LightYellow;
+                        }
                     }
+                    //DateTime dod = Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "dodate"));
                 }
-                //DateTime dod = Convert.ToDateTime(DataBinder.Eval(e.Row.DataItem, "dodate"));
-
-
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
             }
         }
        
-        //protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
-        //{
-        //    if (e.Row.RowType == DataControlRowType.DataRow)
-        //    {
-        //        // Get the value of the desired column
-        //        int value = Convert.ToInt32(DataBinder.Eval(e.Row.DataItem, "ColumnName"));
-
-        //        // Check if the value is greater than 10
-        //        if (value > 10)
-        //        {
-        //            // Store the value in a list
-        //            List<int> values = ViewState["Values"] as List<int> ?? new List<int>();
-        //            values.Add(value);
-        //            ViewState["Values"] = values;
-        //        }
-        //    }
-
-        //}
-
+        /// <summary>
+        /// For debug purposes
+        /// </summary>
+        /// <param name="table"></param>
         public static void DumpDataTable(DataTable table)
         {
             string data = string.Empty;
@@ -252,41 +327,10 @@ namespace NotToDo
                     }
                     s1 += Environment.NewLine;
                 }
-
             }
+            Debug.WriteLine(s1);
 
             return; 
         }
-
-
-        //protected void Button1_Click(object sender, EventArgs e)
-        //{
-        //    Label4.Text = DateTime.Now.ToLongTimeString();
-        //    Label5.Text = DateTime.Now.ToLongTimeString();
-        //    //string str = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "YourColumnName"));
-        //    DateTime dodate;
-
-        //    foreach (GridViewRow row in GridView1.Rows)
-        //    {
-        //       //row.Cells[0].Text = "Hello";
-        //        string x = row.Cells[3].Text;
-        //        if (DateTime.TryParse(row.Cells[3].Text, out dodate))
-        //        { 
-        //            int result = DateTime.Compare(DateTime.Now, dodate);
-        //            Label5.Text = dodate.ToLongTimeString();
-
-        //        }
-        //        foreach (TableCell cell in row.Cells)
-        //        {
-        //            cell.Text = "Hesllo";
-        //            //int index = cell.ColumnIndex;
-        //            //if (index == 0)
-        //            //{
-        //            //    value = cell.Value.ToString();
-        //            //do what you want with the value
-        //            // }
-        //        }
-
-        //    }
     }
 }

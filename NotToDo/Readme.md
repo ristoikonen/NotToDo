@@ -1,8 +1,10 @@
-﻿# Setup
-
+﻿# Login
 ### Use sa, sa to login.
 
-## We need a table to store data and a connection string to it.
+# Setup
+
+
+### We need a table to store data and a connection string to it.
 ### Create TODO table, database name is also TODO 
 
 ```sh

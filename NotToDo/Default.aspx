@@ -1,35 +1,7 @@
 ﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="NotToDo._Default" %>
 
-
-
-
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <main aria-labelledby="title">
-<%--<form id="form1" runat="server">--%>
-
-
-<%--         <div>
-            <asp:UpdatePanel ID="UpdatePanel1" runat="server"
-               UpdateMode="Conditional">
-               <ContentTemplate>
-                  <asp:Label ID="Label4" runat="server" />
-                  <br />
-                  <asp:Button ID="Button1" runat="server"
-                     Text="Update Both Panels" OnClick="Button1_Click" />
-                  <asp:Button ID="Button2" runat="server"
-                     Text="Update This Panel" OnClick="Button2_Click" />
-               </ContentTemplate>
-            </asp:UpdatePanel>
-                         <asp:UpdatePanel ID="UpdatePanel2" runat="server"
-               UpdateMode="Conditional">
-               <ContentTemplate>
-                  <asp:Label ID="Label5" runat="server" ForeColor="red" />
-               </ContentTemplate>
-               <Triggers>
-                  <asp:AsyncPostBackTrigger ControlID="Button1" EventName="Click" />
-               </Triggers>
-            </asp:UpdatePanel>
-    </div>--%>
 
     <div>
 
@@ -82,46 +54,6 @@
 
 
     </div>
-<%--    </form>    --%>
-
-<%--        <asp:ScriptManager ID="ScriptManager" 
-                   runat="server" />
-<asp:UpdatePanel ID="UpdatePanel1" 
-                 UpdateMode="Conditional"
-                 runat="server">
-    <ContentTemplate>
-       <fieldset>
-       <legend>UpdatePanel content</legend>
-        <!-- Other content in the panel. -->
-        <%=DateTime.Now.ToString() %>
-        <br />
-        <asp:Button ID="Button1" 
-                    Text="Refresh Panel" 
-                    runat="server" />
-        </fieldset>
-    </ContentTemplate>
-</asp:UpdatePanel>--%>
-
-
-
-<%--        <asp:Button ID="Button2" 
-            Text="Refresh Panel"
-            runat="server" />
-<asp:ScriptManager ID="ScriptManager1" 
-                   runat="server" />
-<asp:UpdatePanel ID="UpdatePanel2" 
-                 UpdateMode="Conditional"
-                 runat="server">
-                 <Triggers>
-                   <asp:AsyncPostBackTrigger ControlID="Button1" />
-                 </Triggers>
-                 <ContentTemplate>
-                 <fieldset>
-                 <legend>UpdatePanel content</legend>
-                 <%=DateTime.Now.ToString() %>
-                 </fieldset>
-                 </ContentTemplate>
-</asp:UpdatePanel>--%>
 
 </main>
 </asp:Content>

@@ -20,7 +20,6 @@
         <asp:TextBox ID="txtdodateloc"  TextMode="DateTimeLocal" runat="server"></asp:TextBox>
         <br /><br />
 
-        <%--<asp:Label ID="LblDob" runat="server" Text='<%# Bind("DateofBirth") %>'>--%>
 
         <asp:Label ID="lblmsg" runat="server" Text=""></asp:Label>
         <br /><br />
@@ -34,7 +33,7 @@
                 <asp:BoundField DataField="empid" Visible="False" />
                 <asp:BoundField DataField="name" HeaderText="Name" />
                 <asp:BoundField DataField="details" HeaderText="Details" />
-                <asp:BoundField DataField="dodate" HeaderText="Date" />
+                <asp:BoundField DataField="dodate" HeaderText="Do Date" />
                 <asp:TemplateField>
                     <ItemTemplate>
                         <asp:LinkButton ID="SelectButton" runat="server" CommandArgument='<%# Eval("empid") %>' OnClick="Select_Click" >Select</asp:LinkButton>

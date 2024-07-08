@@ -11,6 +11,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Data.SqlTypes;
 using static System.Net.Mime.MediaTypeNames;
+using System.Web.ModelBinding;
 using NotToDo.OutlookAccess;
 
 namespace NotToDo
@@ -19,34 +20,136 @@ namespace NotToDo
     {
         //TODO: safety!
         string cs = "data source=telli;initial catalog=TODO;trusted_connection=true";
+        SqlConnection con = new SqlConnection(@"data source=telli;initial catalog=TODO;trusted_connection=true");
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                DisplayAll();
+                ShowPage();
             }
         }
 
-        SqlConnection con = new SqlConnection(@"data source=telli;initial catalog=TODO;trusted_connection=true");
+
+        //protected void DisplayAll()
+        //{
+        //    using (SqlConnection conn = new SqlConnection(cs))
+        //    {
+
+        //        SqlCommand cmd = new SqlCommand("SELECT * from Todo  WHERE Startdate >= GETDATE()", conn);
+        //        DataTable dt = new DataTable();
+        //        SqlDataAdapter adp = new SqlDataAdapter(cmd);
+        //        adp.Fill(dt);
+        //        DumpDataTable(dt);
+        //        GridView1.DataSource = dt;
+        //        GridView1.DataBind();
+        //    }
+        //}
+
+
+
+
+        public void ShowPage()
+        {
+            //Remind.ReminderExample();
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+
+                SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE Dodate >= GETUTCDATE()", conn);
+                DataTable dt = new DataTable();
+                SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                adp.Fill(dt);
+                DumpDataTable(dt);
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+            }
+        }
+
+
+        //public IQueryable<Student> gridview_Getdata()
+        public object GridView1_GetData()//[Control] AcademicYear? displayYear)
+        {
+            //SchoolContext db = new SchoolContext();
+            //var query = db.Students.Include(s => s.Enrollments.Select(e => e.Course));
+
+            //if (displayYear != null)
+            //{
+            //    query = query.Where(s => s.Year == displayYear);
+            //}
+
+            return null; ;// query;
+        }
+
+        void GridView1_SelectedIndexChanging(Object sender, GridViewSelectEventArgs e)
+        {
+            // Get the currently selected row. Because the SelectedIndexChanging event
+            // occurs before the select operation in the GridView control, the
+            // SelectedRow property cannot be used. Instead, use the Rows collection
+            // and the NewSelectedIndex property of the e argument passed to this 
+            // event handler.
+            GridViewRow row = GridView1.Rows[e.NewSelectedIndex];
+
+            // You can cancel the select operation by using the Cancel
+            // property. For this example, if the user selects a customer with 
+            // the ID "ANATR", the select operation is canceled and an error message
+            // is displayed.
+            if (row.Cells[1].Text == "ANATR")
+            {
+                e.Cancel = true;
+                //MessageLabel.Text = "You cannot select " + row.Cells[2].Text + ".";
+            }
+        }
 
         protected void BtnAdd_Click(object sender, EventArgs e)
         {
+            string tableName = "Todo";
+
             using (SqlConnection conn = new SqlConnection(cs))
             {
-                //string sql = "insert into Todo values('" + txtname.Text + "','" + txtdetails.Text + "','\" + txtdodate.Text + \"')";
-
-                string sql = string.Format($"INSERT into dbo.Todo values('{txtname.Text}', '{txtdetails.Text}', CAST('{txtdodate.Text}' AS DATETIME))"); //, txtname.Text, txtdetails.Text, txtdodate.Text);
+                string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
 
                 Debug.WriteLine(sql ?? "");
 
                 conn.Open();
-
                 SqlCommand cmd = new SqlCommand(sql, conn);
+                
+                
+                DateTime dodate = DateTime.Parse(txtdodateloc.Text);
+                string sdodate = dodate.ToUniversalTime().ToString( "yyyy-MM-ddTHH:mm:ss"); // yyyy-MM-ddTHH:mm:ss");
+                                                                                           // 
+                cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
+                cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
+                cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
+
+
+
+                //string sql = string.Format($"INSERT into dbo.Todo values('{txtname.Text}', '{txtdetails.Text}', '{sdodate}'"); //, txtname.Text, txtdetails.Text, txtdodate.Text);CAST('{txtdodateloc.Text}' AS DATETIME)
+
+                Debug.WriteLine(sql ?? "");
+
                 cmd.ExecuteNonQuery();
                 lblmsg.Text = "Record Inserted Successfully";
+
             }
 
-            DisplayAll();
+            //using (SqlConnection conn = new SqlConnection(cs))
+            //{
+            //    //string sql = "insert into Todo values('" + txtname.Text + "','" + txtdetails.Text + "','\" + txtdodate.Text + \"')";
+            //    DateTime dodate = DateTime.Parse(txtdodateloc.Text);
+            //    string sdodate = dodate.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss"); // yyyy-MM-ddTHH:mm:ss");
+            //    string sql = string.Format($"INSERT into dbo.Todo values('{txtname.Text}', '{txtdetails.Text}', '{sdodate}'"); //, txtname.Text, txtdetails.Text, txtdodate.Text);CAST('{txtdodateloc.Text}' AS DATETIME)
+
+            //    Debug.WriteLine(sql ?? "");
+
+            //    conn.Open();
+
+            //    SqlCommand cmd = new SqlCommand(sql, conn);
+            //    cmd.ExecuteNonQuery();
+            //    lblmsg.Text = "Record Inserted Successfully";
+            //}
+
+            ShowPage();
             ClearAllFields();
         }
 
@@ -78,10 +181,9 @@ namespace NotToDo
                     txtid.Text = dt.Rows[0]["empid"].ToString();
                     txtname.Text = dt.Rows[0]["name"].ToString();
                     txtdetails.Text = dt.Rows[0]["details"].ToString();
-                    //TODO: format date
-                    //txtdodate.Text = dt.Rows[0]["dodate"].ToString("yyyy-MM-ddTHH:mm");
-                    // TODO if success
+                    // TODO errors -  if success
                     DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out dodate);
+                    dodate = dodate.ToLocalTime();
                     txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
                     //txtdodateloc.Text = dt.Rows[0]["dodate"].ToString("yyyy-MM-ddTHH:mm");
                     
@@ -90,7 +192,6 @@ namespace NotToDo
                 //DumpDataTable(dt);
             }
         }
-
 
 
         protected void Reminder_Click(object sender, EventArgs e)
@@ -116,26 +217,6 @@ namespace NotToDo
     });
              */
         }
-
-
-        public void DisplayAll()
-        {
-            //Remind.ReminderExample();
-
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-
-                SqlCommand cmd = new SqlCommand("SELECT * from Todo", conn);
-                DataTable dt = new DataTable();
-                SqlDataAdapter adp = new SqlDataAdapter(cmd);
-                adp.Fill(dt);
-                DumpDataTable(dt);
-                GridView1.DataSource = dt;
-                GridView1.DataBind();
-            }
-        }
-
-
 
 
         protected void BtnUpdate_Click(object sender, EventArgs e)
@@ -185,7 +266,7 @@ namespace NotToDo
                 cmd.ExecuteNonQuery();
                 lblmsg.Text = "Record Updated Successfully";
             }
-            DisplayAll();
+            ShowPage();
         }
 
         protected void BtnDelete_Click(object sender, EventArgs e)
@@ -206,7 +287,7 @@ namespace NotToDo
 
                 lblmsg.Text = "Record Deleted";
             }
-            DisplayAll();
+            ShowPage();
             ClearAllFields();
         }
 

@@ -31,12 +31,14 @@
 
             
         </div>
-        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false"  onrowdatabound="GridView1_RowDataBound" >
+
+
+        <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false" GridLines="Horizontal" CellPadding="4"  OnRowDataBound="GridView1_RowDataBound" >
             <Columns>
                 <asp:BoundField DataField="todoid" Visible="False" />
                 <asp:BoundField DataField="name" HeaderText="Name" />
                 <asp:BoundField DataField="details" HeaderText="Details" />
-                <asp:BoundField DataField="dodate" HeaderText="Do Date" />
+                <asp:BoundField DataField="dodate" HeaderText="Do Date" DataFormatString="{0:f}" />
                 <asp:TemplateField>
                     <ItemTemplate>
                         <asp:LinkButton ID="SelectButton" runat="server" CommandArgument='<%# Eval("todoid") %>' OnClick="Select_Click" >Select</asp:LinkButton>
@@ -48,9 +50,12 @@
             </Columns>
 
         </asp:GridView>
-        
+
         <br /><br />
-        <p class="fw-light"><asp:Label ID="lblmsg" runat="server" Text=""></asp:Label></p>
+        <p class="fw-light">
+            <%--<asp:Label ID="lblmsg" runat="server" Text=""></asp:Label>--%>
+
+        </p>
 
 
     </div>

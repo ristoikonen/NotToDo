@@ -7,13 +7,13 @@
     <div class="form-group">
       <label class="control-label col-sm-2" for="email">Username:</label>
       <div class="col-sm-10">
-        <asp:TextBox ID="TextBox5" runat="server" ></asp:TextBox>
+        <asp:TextBox ID="txtUsername" runat="server" ></asp:TextBox>
       </div>
     </div>
     <div class="form-group">
       <label class="control-label col-sm-2" for="pwd">Password:</label>
       <div class="col-sm-10">          
-        <asp:TextBox ID="TextBox6" runat="server"  TextMode="Password"></asp:TextBox>
+        <asp:TextBox ID="txtPassword" runat="server"  TextMode="Password"></asp:TextBox>
       </div>
     </div>
     <div class="form-group">        
@@ -28,9 +28,15 @@
         <asp:Button ID="Button2" runat="server" OnClick="Button1_Click" Text="Sign In" />
       </div>
     </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+         <asp:Label id="lblLogin" runat="server" />
+      </div>
+    </div>
 
 
-          <div class="dropdown-divider">jdasoidjasoidjaoisd</div>
+       
+          <div class="dropdown-divider"></div>
 
 
 

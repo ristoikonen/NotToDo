@@ -25,6 +25,9 @@ namespace NotToDo
         string cs = "data source=telli;initial catalog=TODO;trusted_connection=true";
         int userId = 0;
 
+        //string au_dateformat = System.Globalization.CultureInfo.GetCultureInfo("en-AU").DateTimeFormat.SortableDateTimePattern;
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -53,18 +56,19 @@ namespace NotToDo
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     string tablename = "Todo";
-                    // days of todos from past shown in grid
+                    // max days of todos from past shown in grid
                     int datediff = 1;
 
                     if (Int32.TryParse(Session["user"].ToString(), out int userid))
                     {
                         string sql = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate FROM dbo.{tablename} " +
-                                                $" WHERE UserId = @userId AND (DATEDIFF(Day,Dodate,GETUTCDATE()) = {datediff} OR Dodate >= GETUTCDATE()) ORDER By dodate");
+                                                $" WHERE UserId = @userId AND (DATEDIFF(Day,Dodate,GETUTCDATE()) <= @datediff OR Dodate >= GETUTCDATE()) ORDER By dodate");
 
                         Debug.WriteLine(sql ?? "");
 
                         SqlCommand cmd = new SqlCommand(sql, conn);
                         cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
+                        cmd.Parameters.Add("@datediff", SqlDbType.Int).Value = datediff;
 
                         //Debug.WriteLine(cmd.CommandText ?? "");
 
@@ -77,7 +81,7 @@ namespace NotToDo
                         GridView1.DataSource = dt;
                         GridView1.DataBind();
 
-                        lblmsg.Text = "";
+
                     }
                 }
             }
@@ -202,7 +206,6 @@ namespace NotToDo
                         cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
                         cmd.ExecuteNonQuery();
 
-                        lblmsg.Text = "Record Deleted";
                     }
                 }
             }
@@ -322,8 +325,7 @@ namespace NotToDo
             {
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
-                    //TODO has dependency on index
-                    if (DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
+                    if (e.Row.Cells.Count > 3 && DateTime.TryParse(e.Row.Cells[3].Text, out DateTime dodate))
                     {
                         int result = DateTime.Compare(DateTime.Now, dodate);
                         if (result <= 0)

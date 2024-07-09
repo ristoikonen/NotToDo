@@ -53,30 +53,32 @@ namespace NotToDo
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
                     string tablename = "Todo";
-                    // how many days from past are todo's shown
+                    // days of todos from past shown in grid
                     int datediff = 1;
-                    //string sql2  = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM dbo.{tableName} "  +
-                    //    "WHERE UserId = {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate");
 
-                    string sql = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM dbo.{tablename} WHERE UserId = {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = {datediff} OR Dodate >= GETUTCDATE() ORDER By dodate");
+                    if (Int32.TryParse(Session["user"].ToString(), out int userid))
+                    {
+                        string sql = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate FROM dbo.{tablename} " +
+                                                $" WHERE UserId = @userId AND (DATEDIFF(Day,Dodate,GETUTCDATE()) = {datediff} OR Dodate >= GETUTCDATE()) ORDER By dodate");
 
-                    Debug.WriteLine(sql ?? "");
-                    
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    
-                    //"SELECT [todoid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] " +
-                    //"WHERE UserId= {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
+                        Debug.WriteLine(sql ?? "");
 
-                    //Debug.WriteLine(cmd.CommandText ?? "");
+                        SqlCommand cmd = new SqlCommand(sql, conn);
+                        cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
 
-                    DataTable dt = new DataTable();
-                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
-                    adp.Fill(dt);
+                        //Debug.WriteLine(cmd.CommandText ?? "");
 
-                    //DumpDataTable(dt);
-                    
-                    GridView1.DataSource = dt;
-                    GridView1.DataBind();
+                        DataTable dt = new DataTable();
+                        SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                        adp.Fill(dt);
+
+                        DumpDataTable(dt);
+
+                        GridView1.DataSource = dt;
+                        GridView1.DataBind();
+
+                        lblmsg.Text = "";
+                    }
                 }
             }
             catch (SqlException exp)
@@ -107,17 +109,17 @@ namespace NotToDo
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand(sql, conn);
+                    if (DateTime.TryParse(txtdodateloc.Text, out DateTime dodate) && Int32.TryParse(Session["user"].ToString(), out int userid))
+                    {
+                        string sdodate = dodate.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss");
 
-                    DateTime dodate = DateTime.Parse(txtdodateloc.Text);
-                    string sdodate = dodate.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss");
+                        cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
+                        cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
+                        cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
+                        cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
 
-                    cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
-                    cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
-                    cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
-                    cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userId;
-
-                    cmd.ExecuteNonQuery();
-                    lblmsg.Text = "Record Inserted Successfully";
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
             catch (SqlException exp)
@@ -141,27 +143,29 @@ namespace NotToDo
         protected void BtnUpdate_Click(object sender, EventArgs e)
         {
             string tableName = "Todo";
-            string id = txtid.Text;
+
             try
             {
-                if (DateTime.TryParse(txtdodateloc.Text, out DateTime dodate))
+                if (DateTime.TryParse(txtdodateloc.Text, out DateTime dodate)  && Int32.TryParse(Session["user"].ToString(), out int userid)
+                    && Int32.TryParse(txtid.Text, out int todoid) )
                 {
                     dodate = dodate.ToUniversalTime();
 
                     using (SqlConnection conn = new SqlConnection(cs))
                     {
-                        string sql = string.Format($"UPDATE {tableName} set name = @name , details= @details , dodate= @dodate WHERE todoid = '{id}' AND userid = {userId}");
-                        //Debug.WriteLine(sql);
+                        string sql = string.Format($"UPDATE {tableName} SET name = @name , details= @details , dodate= @dodate WHERE todoid = @todoid AND userid = @userid");
+                        Debug.WriteLine(sql);
 
                         conn.Open();
 
                         SqlCommand cmd = new SqlCommand(sql, conn);
+                        cmd.Parameters.Add("@todoid", SqlDbType.Int).Value = todoid;
                         cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
                         cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
-                        cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; // txtdodateloc.Text;
+                        cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate; 
+                        cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
                         cmd.ExecuteNonQuery();
 
-                        lblmsg.Text = "Record Updated Successfully";
                     }
                 }
             }
@@ -186,15 +190,16 @@ namespace NotToDo
         {
             try
             {
-                if (Int32.TryParse(txtid.Text, out int id))
+                if (Int32.TryParse(txtid.Text, out int todoid) &&  Int32.TryParse(Session["user"].ToString(), out int userid))
                 {
                     using (SqlConnection conn = new SqlConnection(cs))
                     {
                         conn.Open();
 
-                        string sql = string.Format($"DELETE from Todo where todoid = @id  AND userid = {userId}");
+                        string sql = string.Format($"DELETE from Todo WHERE todoid = @todoid  AND userid = @userId");
                         SqlCommand cmd = new SqlCommand(sql, conn);
-                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                        cmd.Parameters.Add("@todoid", SqlDbType.Int).Value = todoid;
+                        cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
                         cmd.ExecuteNonQuery();
 
                         lblmsg.Text = "Record Deleted";
@@ -218,7 +223,7 @@ namespace NotToDo
         /// <summary>
         /// Grids Select link
         /// </summary>
-        /// <param name="sender">Has rows id</param>
+        /// <param name="sender">Has rows todoid</param>
         /// <param name="e"></param>
         protected void Select_Click(object sender, EventArgs e)
         {
@@ -229,26 +234,28 @@ namespace NotToDo
                 if (Int32.TryParse(((LinkButton)sender).CommandArgument, out todoid))
                 { 
                     int rowIndex = Convert.ToInt32(((LinkButton)sender).CommandArgument);
-
-                    using (SqlConnection conn = new SqlConnection(cs))
-                    {
-                        SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE todoid = @colval  AND userid = {userId}"), conn);
-                        cmd.Parameters.Add("@colval", SqlDbType.Int).Value = todoid;
-
-                        DataTable dt = new DataTable();
-                        SqlDataAdapter adp = new SqlDataAdapter(cmd);
-                        adp.Fill(dt);
-                        //DumpDataTable(dt);
-                        if (dt.Rows.Count >= 0)
+                    if (Int32.TryParse(Session["user"].ToString(), out int userid))
+                    { 
+                        using (SqlConnection conn = new SqlConnection(cs))
                         {
-                            txtid.Text = dt.Rows[0]["todoid"].ToString();
-                            txtname.Text = dt.Rows[0]["name"].ToString();
-                            txtdetails.Text = dt.Rows[0]["details"].ToString();
-
-                            if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out DateTime dodate))
+                            SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE todoid = @colval  AND userid = @userid"), conn);
+                            cmd.Parameters.Add("@colval", SqlDbType.Int).Value = todoid;
+                            cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userid;
+                            Debug.WriteLine(cmd?.CommandText ?? "");
+                            DataTable dt = new DataTable();
+                            SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                            adp.Fill(dt);
+                            DumpDataTable(dt);
+                            if (dt.Rows.Count >= 0)
                             {
-                                dodate = dodate.ToLocalTime();
-                                txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
+                                txtid.Text = dt.Rows[0]["todoid"].ToString();
+                                txtname.Text = dt.Rows[0]["name"].ToString();
+                                txtdetails.Text = dt.Rows[0]["details"].ToString();
+                                if (DateTime.TryParse(dt.Rows[0]["dodate"].ToString(), out DateTime dodate))
+                                {
+                                    dodate = dodate.ToLocalTime();
+                                    txtdodateloc.Text = dodate.ToString("yyyy-MM-ddTHH:mm");
+                                }
                             }
                         }
                     }
@@ -262,6 +269,7 @@ namespace NotToDo
             {
                 Debug.WriteLine(ex.ToString());
             }
+            ShowPage();
         }
 
 
@@ -280,17 +288,17 @@ namespace NotToDo
             string[] args = arguments.Split(';');
 
             // TODO: missing parameters and validation
-            if (Int32.TryParse(args[0], out todoid))
+            if (Int32.TryParse(args[0], out todoid)  && Int32.TryParse(Session["user"].ToString(), out int userid))
             { 
                 if(DateTime.TryParse(args[1], out startdate))
-                    try
-                    {
-                         Remind.ReminderExample(userId, todoid, startdate);
-                    }
-                    catch (System.Exception ex )
-                    {
-                        Debug.WriteLine(ex.ToString());
-                    }
+                try
+                {
+                    Remind.ReminderExample(userid, todoid, startdate);
+                }
+                catch (System.Exception ex )
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
             }
         }
 

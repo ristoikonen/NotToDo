@@ -14,9 +14,10 @@
               </li>
               <li class="list-group-item">
                     3. Setup solutions setup: Add connections, enable SSL, create basic Db table, git codebase.
+                        <p> Find versions via console: Bootstrap: 5.2.3 , jQuery: 3.7.0
               </li>
               <li class="list-group-item">
-                    4. Replace CRUDs, remove session variable, add Display and Clear UI methods.
+                    4. Replace CRUDs, remove unneccessary session variable, add Display and Clear UI methods.
               </li>
               <li class="list-group-item">
                     5. Change Db dates to UTC and display dates to local datetime , add conversions, time handling of form
@@ -25,7 +26,7 @@
                     6. Add crude Outlook reminder integration
               </li>
              <li class="list-group-item">
-                    7.  Add basic, no good, Forms login
+                    7.  Add basic Forms login
                 </li>
         </ul>
 

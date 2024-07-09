@@ -33,14 +33,14 @@
         </div>
         <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false"  onrowdatabound="GridView1_RowDataBound" >
             <Columns>
-                <asp:BoundField DataField="empid" Visible="False" />
+                <asp:BoundField DataField="todoid" Visible="False" />
                 <asp:BoundField DataField="name" HeaderText="Name" />
                 <asp:BoundField DataField="details" HeaderText="Details" />
                 <asp:BoundField DataField="dodate" HeaderText="Do Date" />
                 <asp:TemplateField>
                     <ItemTemplate>
-                        <asp:LinkButton ID="SelectButton" runat="server" CommandArgument='<%# Eval("empid") %>' OnClick="Select_Click" >Select</asp:LinkButton>
-                        <asp:LinkButton ID="ReminderButton" runat="server" CommandArgument=' <%# Eval("empid") + ";" + Eval("dodate")  %>' OnClick="Reminder_Click" >Reminder</asp:LinkButton>
+                        <asp:LinkButton ID="SelectButton" runat="server" CommandArgument='<%# Eval("todoid") %>' OnClick="Select_Click" >Select</asp:LinkButton>
+                        <asp:LinkButton ID="ReminderButton" runat="server" CommandArgument=' <%# Eval("todoid") + ";" + Eval("dodate")  %>' OnClick="Reminder_Click" >Reminder</asp:LinkButton>
                         <asp:Label id="msglabel" runat="server"></asp:Label>
                     </ItemTemplate>
                 </asp:TemplateField>

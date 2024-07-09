@@ -13,7 +13,7 @@ namespace NotToDo.OutlookAccess
     {
 
 
-        public static void ReminderExample(int empid, DateTime startDate)
+        public static void ReminderExample(int userid, int todoid, DateTime startDate)
         {
             //try
             //{

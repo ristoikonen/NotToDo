@@ -23,12 +23,22 @@ namespace NotToDo
     {
         //TODO: conn string safety!
         string cs = "data source=telli;initial catalog=TODO;trusted_connection=true";
+        int userId = 0;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                ShowPage();
+                Int32.TryParse(Request.QueryString["userid"], out int x);
+                Debug.Print(x.ToString());
+                if (Int32.TryParse(Request.QueryString["userid"], out userId))
+                {
+                    ShowPage();
+                }
+                else 
+                {
+                    Response.Redirect("Logon.aspx", true);
+                }  
             }
         }
 
@@ -42,7 +52,20 @@ namespace NotToDo
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    SqlCommand cmd = new SqlCommand("SELECT [empid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] WHERE DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
+                    string tablename = "Todo";
+                    // how many days from past are todo's shown
+                    int datediff = 1;
+                    //string sql2  = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM dbo.{tableName} "  +
+                    //    "WHERE UserId = {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate");
+
+                    string sql = string.Format($"SELECT todoid ,name ,details ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM dbo.{tablename} WHERE UserId = {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = {datediff} OR Dodate >= GETUTCDATE() ORDER By dodate");
+
+                    Debug.WriteLine(sql ?? "");
+                    
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    
+                    //"SELECT [todoid] ,[name] ,[details] ,CONVERT(datetime, SWITCHOFFSET(CONVERT(datetimeoffset, [dodate]), DATENAME(TzOffset, SYSDATETIMEOFFSET())))  AS dodate  FROM [dbo].[Todo] " +
+                    //"WHERE UserId= {userId} AND DATEDIFF(Day,Dodate,GETUTCDATE()) = 1 OR Dodate >= GETUTCDATE() ORDER By dodate", conn);
 
                     //Debug.WriteLine(cmd.CommandText ?? "");
 
@@ -79,7 +102,7 @@ namespace NotToDo
             {
                 using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    string sql = string.Format($"INSERT into dbo.{tableName} values ( @name , @details , @dodate)");
+                    string sql = string.Format($"INSERT into dbo.{tableName}  (name ,details ,dodate ,userid) VALUES ( @name , @details , @dodate, @userid)");
 
                     conn.Open();
 
@@ -91,6 +114,7 @@ namespace NotToDo
                     cmd.Parameters.Add("@name", SqlDbType.VarChar, 50).Value = txtname.Text;
                     cmd.Parameters.Add("@details", SqlDbType.VarChar, 5000).Value = txtdetails.Text;
                     cmd.Parameters.Add("@dodate", SqlDbType.DateTime).Value = dodate.ToUniversalTime();
+                    cmd.Parameters.Add("@userid", SqlDbType.Int).Value = userId;
 
                     cmd.ExecuteNonQuery();
                     lblmsg.Text = "Record Inserted Successfully";
@@ -126,7 +150,7 @@ namespace NotToDo
 
                     using (SqlConnection conn = new SqlConnection(cs))
                     {
-                        string sql = string.Format($"UPDATE {tableName} set name = @name , details= @details , dodate= @dodate where empid = '{id}'");
+                        string sql = string.Format($"UPDATE {tableName} set name = @name , details= @details , dodate= @dodate WHERE todoid = '{id}' AND userid = {userId}");
                         //Debug.WriteLine(sql);
 
                         conn.Open();
@@ -168,7 +192,7 @@ namespace NotToDo
                     {
                         conn.Open();
 
-                        string sql = string.Format($"DELETE from Todo where empid = @id");
+                        string sql = string.Format($"DELETE from Todo where todoid = @id  AND userid = {userId}");
                         SqlCommand cmd = new SqlCommand(sql, conn);
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
                         cmd.ExecuteNonQuery();
@@ -198,18 +222,18 @@ namespace NotToDo
         /// <param name="e"></param>
         protected void Select_Click(object sender, EventArgs e)
         {
-            int empid = 0;
+            int todoid = 0;
             string tableName = "Todo";
             try
             {
-                if (Int32.TryParse(((LinkButton)sender).CommandArgument, out empid))
+                if (Int32.TryParse(((LinkButton)sender).CommandArgument, out todoid))
                 { 
                     int rowIndex = Convert.ToInt32(((LinkButton)sender).CommandArgument);
 
                     using (SqlConnection conn = new SqlConnection(cs))
                     {
-                        SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE empid = @colval;"), conn);
-                        cmd.Parameters.Add("@colval", SqlDbType.Int).Value = empid;
+                        SqlCommand cmd = new SqlCommand(string.Format($"SELECT * FROM {tableName} WHERE todoid = @colval  AND userid = {userId}"), conn);
+                        cmd.Parameters.Add("@colval", SqlDbType.Int).Value = todoid;
 
                         DataTable dt = new DataTable();
                         SqlDataAdapter adp = new SqlDataAdapter(cmd);
@@ -217,7 +241,7 @@ namespace NotToDo
                         //DumpDataTable(dt);
                         if (dt.Rows.Count >= 0)
                         {
-                            txtid.Text = dt.Rows[0]["empid"].ToString();
+                            txtid.Text = dt.Rows[0]["todoid"].ToString();
                             txtname.Text = dt.Rows[0]["name"].ToString();
                             txtdetails.Text = dt.Rows[0]["details"].ToString();
 
@@ -250,18 +274,18 @@ namespace NotToDo
         /// <param name="e"></param>
         protected void Reminder_Click(object sender, EventArgs e)
         {
-            int empid = 0;
+            int todoid = 0;
             DateTime startdate;
             string arguments = ((LinkButton)sender).CommandArgument;
             string[] args = arguments.Split(';');
 
             // TODO: missing parameters and validation
-            if (Int32.TryParse(args[0], out empid))
+            if (Int32.TryParse(args[0], out todoid))
             { 
                 if(DateTime.TryParse(args[1], out startdate))
                     try
                     {
-                         Remind.ReminderExample(empid, startdate);
+                         Remind.ReminderExample(userId, todoid, startdate);
                     }
                     catch (System.Exception ex )
                     {

@@ -19,13 +19,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[Todo](
-	[empid] [int] IDENTITY(1,1) NOT NULL,
+	[todoid] [int] IDENTITY(1,1) NOT NULL,
 	[name] [varchar](100) NULL,
 	[details] [varchar](5000) NULL,
 	[dodate] [datetime] NULL,
 PRIMARY KEY CLUSTERED 
 (
-	[empid] ASC
+	[todoid] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -52,6 +52,6 @@ where name = suser_name()
 
 Comment line 
 ```sh
-Remind.ReminderExample(empid, startdate)
+Remind.ReminderExample(todoid, startdate)
 ```
 from default.aspx.cs (~line 129) if you do not want to use Outlook reminders

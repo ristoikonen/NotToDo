@@ -1,9 +1,18 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeBehind="Logon.aspx.cs" Inherits="NotToDo.Logon" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" Runat="Server">
-    <h1>
-        Login Page</h1>
+    <h2>NotToDo Login</h2>
     <p>
-        Username:
+           Username:
+        <p>
+            <asp:TextBox ID="txtUsername" runat="server" ></asp:TextBox>
+        <p>
+            Password:
+            <asp:TextBox ID="txtPassword" runat="server"  TextMode="Password"></asp:TextBox>
+        <p>
+            <asp:Button ID="Button1" runat="server" BorderStyle="None" Font-Size="X-Large" OnClick="Button1_Click" Text="Log In" />
+            <asp:Label ID="lblLogin" runat="server" ></asp:Label>
+
+<%--        Username:
         <asp:TextBox ID="UserName" runat="server"></asp:TextBox></p>
     <p>
         Password:
@@ -14,7 +23,7 @@
         <asp:Button ID="LoginButton" runat="server" Text="Login" OnClick="LoginButton_Click" /> </p>
     <p>
         <asp:Label ID="InvalidCredentialsMessage" runat="server" ForeColor="Red" Text="Your username or password is invalid. Please try again."
-            Visible="False"></asp:Label> </p>
+            Visible="False"></asp:Label> </p>--%>
 </asp:Content>
 
 <%--<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Logon.aspx.cs" Inherits="NotToDo.Logon" %>

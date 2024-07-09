@@ -13,7 +13,7 @@
                     2. Get template sample from GitHub: simple, Web Forms app:	https://gist.github.com/Aneeq/dc10e6ef5e8c363dd7acd80a157c40d3
               </li>
               <li class="list-group-item">
-                    3. Setup solutions setup: Add connections, create basic Db table, git codebase.
+                    3. Setup solutions setup: Add connections, enable SSL, create basic Db table, git codebase.
               </li>
               <li class="list-group-item">
                     4. Replace CRUDs, remove session variable, add Display and Clear UI methods.

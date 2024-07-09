@@ -7,36 +7,88 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Web.Security;
 using System.Data;
+using System.Drawing;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace NotToDo
 {
     // https://learn.microsoft.com/en-us/troubleshoot/developer/webapps/aspnet/development/forms-based-authentication#configure-security-settings-in-the-webconfig-file
     public partial class Logon : System.Web.UI.Page
     {
+
+        //TODO: conn string safety!
+        string cs = "data source=telli;initial catalog=TODO;trusted_connection=true";
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
         }
 
-        protected void LoginButton_Click(object sender, EventArgs e)
+
+        protected void Button1_Click(object sender, EventArgs e)
         {
-            // Three valid username/password pairs: Scott/password, Jisun/password, and Sam/password.
-            string[] users = { "Scott", "user", "sa" };
-            string[] passwords = { "password", "password", "sa" };
-            for (int i = 0; i < users.Length; i++)
+
+            string tableName = "Users";
+
+            try
             {
-                bool validUsername = (string.Compare(UserName.Text, users[i], true) == 0);
-                bool validPassword = (string.Compare(Password.Text, passwords[i], false) == 0);
-                if (validUsername && validPassword)
+                using (SqlConnection conn = new SqlConnection(cs))
                 {
-                    // TODO: Log in the user...
-                    // TODO: Redirect them to the appropriate page
-                    Response.Redirect("Default.aspx");
+                    conn.Open();
+
+                    string sql = string.Format($"SELECT * FROM {tableName} WHERE Username=  @name AND Pwd = @password;");
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.Add("@name", SqlDbType.VarChar).Value = txtUsername.Text;
+                    cmd.Parameters.Add("@password", SqlDbType.VarChar).Value = txtPassword.Text;
+
+                    DataTable dt = new DataTable();
+                    SqlDataAdapter adp = new SqlDataAdapter(cmd);
+                    adp.Fill(dt);
+                    //DumpDataTable(dt);
+                    if (dt.Rows.Count == 1)
+                    {
+                        // todo tryparse
+                        int userid = dt.Rows[0].Field<int>("Userid");
+                        Session["user"] = userid.ToString();
+                        Response.Redirect("Default.aspx?userid=" + userid.ToString(),true);
+                    }
+                    else
+                    {
+                        lblLogin.Text = "Invalid username/password.";
+                    }
+                    
                 }
             }
-            // If we reach here, the user's credentials were invalid
-            InvalidCredentialsMessage.Visible = true;
+            catch (SqlException exp)
+            {
+                Debug.WriteLine(exp.ToString());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
         }
+
+        
+        //protected void LoginButton_Click(object sender, EventArgs e)
+        //{
+        //    // Three valid username/password pairs: Scott/password, Jisun/password, and Sam/password.
+        //    string[] users = { "Scott", "user", "sa" };
+        //    string[] passwords = { "password", "password", "sa" };
+        //    for (int i = 0; i < users.Length; i++)
+        //    {
+        //        bool validUsername = (string.Compare(UserName.Text, users[i], true) == 0);
+        //        bool validPassword = (string.Compare(Password.Text, passwords[i], false) == 0);
+        //        if (validUsername && validPassword)
+        //        {
+        //            Response.Redirect("Default.aspx");
+        //        }
+        //    }
+        //    // If we reach here, the user's credentials were invalid
+        //    InvalidCredentialsMessage.Visible = true;
+        //}
 
         //private void cmdLogin_ServerClick(object sender, System.EventArgs e)
         //{

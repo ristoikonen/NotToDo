@@ -46,12 +46,16 @@ namespace NotToDo
                     SqlDataAdapter adp = new SqlDataAdapter(cmd);
                     adp.Fill(dt);
                     //DumpDataTable(dt);
-                    if (dt.Rows.Count == 1)
+                    if (dt.Rows.Count == 1 )
                     {
-                        // todo tryparse
+                        // todo checks
                         int userid = dt.Rows[0].Field<int>("Userid");
-                        Session["user"] = userid.ToString();
-                        Response.Redirect("Default.aspx?userid=" + userid.ToString(),true);
+                        //Session["user"] = userid.ToString();
+                        //FormsAuthentication.SetAuthCookie(username, true);
+                        // txtUsername.Text                                                
+                        FormsAuthentication.RedirectFromLoginPage(userid.ToString(), CheckBoxRememberMe.Checked);
+                        
+                        //Response.Redirect("Default.aspx?userid=" + userid.ToString(),true);
                     }
                     else
                     {
@@ -70,8 +74,19 @@ namespace NotToDo
             }
 
         }
+        // we can use this to authorise users to access admin page etc/
+        public bool IsAuthorized(string dashboardId)
+        {
+            var identityName = HttpContext.Current.User?.Identity?.Name; 
+            if (!string.IsNullOrEmpty(identityName))
+            {
+                return false; //authDictionary.ContainsKey(identityName) && authDictionary[identityName].Contains(pageId);
+            }
 
-        
+            return false;
+        }
+
+
         //protected void LoginButton_Click(object sender, EventArgs e)
         //{
         //    // Three valid username/password pairs: Scott/password, Jisun/password, and Sam/password.

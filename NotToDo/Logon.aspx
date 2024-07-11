@@ -19,7 +19,9 @@
     <div class="form-group">        
       <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
-          <label><input type="checkbox" name="remember"> Remember me</label>
+            <label class="control-label col-sm-2" for="CheckBoxRememberMe">Remember me: </label>
+          <asp:CheckBox ID="CheckBoxRememberMe"  runat="server" />
+              <%--<input type="checkbox" name="chkRememberMe">Remember me</label>--%>
         </div>
       </div>
     </div>

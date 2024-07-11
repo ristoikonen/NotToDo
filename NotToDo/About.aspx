@@ -23,10 +23,10 @@
                     5. Change Db dates to UTC and display dates to local datetime , add conversions, time handling of form
               </li>
               <li class="list-group-item">
-                    6. Add crude Outlook reminder integration
+                    6. Add crude Outlook reminder integration. refrerence Microsoft.Office.Interop.Outlook
               </li>
              <li class="list-group-item">
-                    7.  Add basic Forms login
+                    7.  Add basic Forms, db dependant login. Integrate userid to queries.
                 </li>
         </ul>
 

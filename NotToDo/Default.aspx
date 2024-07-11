@@ -50,14 +50,6 @@
             </Columns>
 
         </asp:GridView>
-
-        <br /><br />
-        <p class="fw-light">
-            <%--<asp:Label ID="lblmsg" runat="server" Text=""></asp:Label>--%>
-
-        </p>
-
-
     </div>
 
 </main>

@@ -57,7 +57,7 @@ CREATE TABLE [dbo].[Users](
 GO
 
 
-### Get connection string to database using this query, place output string in default.aspx.cs line 24 (string cs)
+### Get connection string to database using this query, place output string in web.config, it is the last element there.
 
 ```sh
 select
@@ -74,9 +74,11 @@ from sys.server_principals
 where name = suser_name()
 ```
 
-## NOTE
+## NOTES
 
-Comment line 
+Has reference to Microsoft.Office.Interop.Outlook for reminders.
+Remove reference and comment out 
+
 ```sh
 Remind.ReminderExample(todoid, startdate)
 ```

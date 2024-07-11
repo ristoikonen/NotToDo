@@ -85,7 +85,11 @@ Remind.ReminderExample(todoid, startdate)
 ```
 from default.aspx.cs (~line 129) if you do not want to use Outlook reminders
 
-```
+
+
+See TODO comments for next steps.
+Unit test not implemented.
+
 
 
 

@@ -1,8 +1,11 @@
-﻿# Setup
+﻿### See About page for steps taken to create this project
+
+# Setup
 
 
-### We need a table to store data and a connection string to it.
-### Create TODO table, database name is also TODO 
+## We need a table to store data, users tabel and a connection string
+.
+#### Create TODO table, database name is also TODO 
 
 ```sh
 USE [TODO]
@@ -28,7 +31,7 @@ PRIMARY KEY CLUSTERED
 GO
 ```
 
-### Create table for users: Users, add sample data
+#### Create table for users: Users, add sample data
 
 ```sh
 
@@ -52,11 +55,12 @@ CREATE TABLE [dbo].[Users](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+```
 
-
-### Get connection string to database using this query, place output string in web.config, it is the last element there.
+#### Get connection string to database using this query, place output string in web.config, it is the last element there.
 
 ```sh
+
 select
     'data source=' + @@servername +
     ';initial catalog=' + db_name() +
@@ -80,5 +84,8 @@ Remove reference and comment out
 Remind.ReminderExample(todoid, startdate)
 ```
 from default.aspx.cs (~line 129) if you do not want to use Outlook reminders
+
+```
+
 
 

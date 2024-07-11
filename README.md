@@ -1,7 +1,4 @@
-﻿# Login
-### Use sa, sa to login.
-
-# Setup
+﻿# Setup
 
 
 ### We need a table to store data and a connection string to it.

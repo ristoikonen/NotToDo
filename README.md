@@ -1,6 +1,6 @@
-﻿### See About page for steps taken to create this project
+﻿### See About page for my steps to create this project
 
-# Setup
+# Setup ASP.NET TODO code
 
 
 ## We need a table to store data, users tabel and a connection string
@@ -92,7 +92,7 @@ Remind.ReminderExample(todoid, startdate)
 
 
 
-
+### Risto Ikonen 2024
 
 
 

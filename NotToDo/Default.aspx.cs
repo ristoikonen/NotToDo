@@ -23,23 +23,14 @@ namespace NotToDo
 {
     public partial class _Default : Page
     {
-        //TODO: conn string safety, see Encrypting Configuration File Sections
-
-
-        //string au_dateformat = System.Globalization.CultureInfo.GetCultureInfo("en-AU").DateTimeFormat.SortableDateTimePattern;
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                // This is an unauthorized, authenticated request...
-                //    Response.Redirect("~/UnauthorizedAccess.aspx");
                
-                if (Request.IsAuthenticated )//(Session["user"].ToString(), out userId))
+                if (Request.IsAuthenticated )
                 {
                     Debug.Print(GetUserID().ToString());
-                    bool isau = Request.IsAuthenticated;
-                    string iden = HttpContext.Current.User?.Identity?.Name;
 
                     ShowPage();
                 }
